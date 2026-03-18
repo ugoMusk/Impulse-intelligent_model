@@ -23,7 +23,7 @@ The **IIMo system** is designed as a **modular, hybrid AI pipeline** composed of
            |
            v
 +-------------------------------+
-| Firestorm Transformer Model   |
+| IIMo Transformer Model   |
 +----------+--------------------+
            |
            v
@@ -122,38 +122,6 @@ Processes and structures outputs from the model.
 6. Reasoning Layer structures response
 7. Response Builder assembles output
 8. Final result returned to user
-```
-
----
-
-
-## Hybrid AI Architecture (Core Design)
-
-```
-             +----------------------+
-             |     User Query       |
-             +----------+-----------+
-                        |
-        +---------------+----------------+
-        |                                |
-        v                                v
-+-------------------+         +------------------------+
-| Neural Reasoning  |         | Retrieval System       |
-| (Transformer)     |         | (Vector Search)        |
-+---------+---------+         +-----------+------------+
-          |                               |
-          +---------------+---------------+
-                          |
-                          v
-               +----------------------+
-               | Fusion Layer         |
-               | (Reasoning + Context)|
-               +----------+-----------+
-                          |
-                          v
-               +----------------------+
-               | Final Response       |
-               +----------------------+
 ```
 
 ---
