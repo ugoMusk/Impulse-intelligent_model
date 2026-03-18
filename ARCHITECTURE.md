@@ -201,8 +201,10 @@ flowchart TD
     E --> G[Knowledge Engine]
 
     G --> H[Vector Database (Qdrant)]
-
+    H --> G
+    
     F --> I[Response Builder]
+    G --> I
 
     I --> J[Final Output]
 ```
