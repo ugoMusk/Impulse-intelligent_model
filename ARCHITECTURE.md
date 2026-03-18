@@ -200,9 +200,9 @@ flowchart TD
     E --> F[Code Engine]
     E --> G[Knowledge Engine]
 
-    G --> H[Vector Database (Qdrant)]
+    G --> H[Vector Database]
     H --> G
-    
+
     F --> I[Response Builder]
     G --> I
 
