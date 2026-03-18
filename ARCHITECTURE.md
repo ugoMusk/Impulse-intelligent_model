@@ -126,36 +126,6 @@ Processes and structures outputs from the model.
 
 ---
 
-## Deployment Architecture
-
-```
-+----------------------+
-|       Client         |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|    FastAPI Server    |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|  Inference Engine    |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|  Firestorm Model     |
-+----------+-----------+
-           |
-           v
-+----------------------+
-|  Vector Database     |
-|     (Qdrant)         |
-+----------------------+
-```
-
----
 
 ## Hybrid AI Architecture (Core Design)
 
@@ -188,7 +158,7 @@ Processes and structures outputs from the model.
 
 ---
 
-## Exportable Diagram (Mermaid)
+## Deployment Architecture
 
 ```mermaid
 flowchart TD
@@ -200,7 +170,7 @@ flowchart TD
     E --> F[Code Engine]
     E --> G[Knowledge Engine]
 
-    G --> H[Vector Database==Quadrant]
+    G --> H[Vector Database→Quadrant]
     H --> G
 
     F --> I[Response Builder]
