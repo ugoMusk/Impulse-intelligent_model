@@ -194,17 +194,15 @@ Processes and structures outputs from the model.
 flowchart TD
     A[User Query] --> B[API Layer]
     B --> C[Inference Engine]
-    C --> D[IIMo Transformer Model]
+    C --> D[Firestorm Transformer Model]
     D --> E[Reasoning Layer]
 
     E --> F[Code Engine]
     E --> G[Knowledge Engine]
 
     G --> H[Vector Database (Qdrant)]
-    H --> G
 
     F --> I[Response Builder]
-    G --> I
 
     I --> J[Final Output]
 ```
