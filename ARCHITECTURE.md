@@ -194,7 +194,7 @@ Processes and structures outputs from the model.
 flowchart TD
     A[User Query] --> B[API Layer]
     B --> C[Inference Engine]
-    C --> D[Firestorm Transformer Model]
+    C --> D[ugonuel-impulse-titan-1 Transformer Model]
     D --> E[Reasoning Layer]
 
     E --> F[Code Engine]
