@@ -200,7 +200,7 @@ flowchart TD
     E --> F[Code Engine]
     E --> G[Knowledge Engine]
 
-    G --> H[Vector Database(Quadrant)]
+    G --> H[Vector Database\(Quadrant\)]
     H --> G
 
     F --> I[Response Builder]
