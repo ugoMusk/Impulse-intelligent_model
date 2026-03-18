@@ -1,6 +1,6 @@
-# Impulse Intelligent Model (IIM)
+# Impulse Intelligent Model (IIMo)
 
-The **Impulse Intelligent Model (IIM)** is a research-driven AI project designed to demonstrate how modern AI systems can combine:
+The **Impulse Intelligent Model (IIMo)** is a research-driven AI project designed to demonstrate how modern AI systems can combine:
 
 - **Machine Learning**
 - **Retrieval-Augmented Reasoning**
@@ -20,7 +20,7 @@ The project was developed for the **Impulse AI Model Track Hackathon** with the 
 
 # Overview
 
-The **Impulse Intelligent Model (IIM)** is a **multi-capability AI system** powered by a **transformer-based reasoning model** trained through the **Impulse ML training pipeline**.
+The **Impulse Intelligent Model (IIMo)** is a **multi-capability AI system** powered by a **transformer-based reasoning model** trained through the **Impulse ML training pipeline**.
 
 The system integrates three core capabilities:
 
