@@ -175,7 +175,7 @@ flowchart TD
     F --> G[Prompt Builder]
     C --> G
 
-    G --> H[ugonuel-impulse-titan-1 Transformer Model (TensorFlow)]
+    G --> H[ugonuel-impulse-titan-1 Transformer Model ~ TensorFlow]
     H --> I[Output Formatter]
     I --> J[Final Output]
 ```
