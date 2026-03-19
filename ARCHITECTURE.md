@@ -1,6 +1,6 @@
 # System Architecture — Impulse Intelligent Model (IIMo)
 
-The **IIMo system** is designed as a **modular, hybrid AI pipeline** composed of multiple interacting subsystems that enable reasoning, retrieval, and real-time inference.
+The **IIMo system** is designed as a **modular, retrieval-augmented AI pipeline** that integrates transformer-based reasoning with external knowledge retrieval for real-time inference.
 
 ---
 
@@ -22,34 +22,30 @@ The **IIMo system** is designed as a **modular, hybrid AI pipeline** composed of
 +----------+-----------+
            |
            v
++----------------------+
+| Retrieval Module     |
+| (Embeddings + DB)    |
++----------+-----------+
+           |
+           v
++----------------------+
+| Prompt Builder       |
+| (Instruction+Context)|
++----------+-----------+
+           |
+           v
 +-------------------------------+
-| IIMo Transformer Model   |
+| IIMo Transformer Model        |
+| (TensorFlow)                  |
 +----------+--------------------+
            |
            v
 +----------------------+
-|   Reasoning Layer    |
+| Output Formatter     |
 +----------+-----------+
            |
-     +-----+------+
-     |            |
-     v            v
-+---------+   +------------------+
-| Code    |   | Knowledge Engine |
-| Engine  |   | (Retrieval)      |
-+----+----+   +--------+---------+
-     |                 |
-     v                 v
-Code Output     Retrieval Context
-     \                 /
-      \               /
-       +------v------+
-       | Response    |
-       | Builder     |
-       +------+
-              |
-              v
-         Final Output
+           v
+        Final Output
 ```
 
 ---
@@ -69,45 +65,71 @@ Provides external access to the system through REST endpoints.
 
 ### 2. Inference Engine
 
-Manages model execution and orchestration.
+Central orchestration layer responsible for executing the full AI pipeline.
 
 **Responsibilities:**
+- Input handling  
+- Retrieval orchestration  
+- Prompt construction  
 - Tokenization  
-- Model forward pass  
-- Decoding predictions  
+- Model execution  
+- Output decoding  
 
 ---
 
-### 3. IIMo (ugonuel-impulse-titan-1)
+### 3. IIMo Transformer Model (ugonuel-impulse-titan-1)
 
-The core neural model responsible for reasoning and generation.
+The core neural model built using **TensorFlow/Keras**, responsible for reasoning and generation.
 
 **Architecture Components:**
 - Token embeddings  
-- Transformer encoder layers  
+- Transformer layers (attention mechanisms)  
 - Prediction head  
 
 ---
 
-### 4. Retrieval-Augmented Knowledge Module
+### 4. Retrieval Module
 
-Enables dynamic access to external knowledge.
+Enables dynamic knowledge augmentation using a vector database.
 
 **Components:**
 - Embedding generator  
-- Vector database (Qdrant)  
-- Similarity search engine  
+- Vector database (**Qdrant**)  
+- Similarity search  
+
+**Responsibilities:**
+- Convert query into embeddings  
+- Perform nearest-neighbor search  
+- Return relevant contextual documents  
 
 ---
 
-### 5. Reasoning Layer
+### 5. Prompt Builder (Reasoning Input Layer)
 
-Processes and structures outputs from the model.
+Constructs structured inputs for the model to enable effective reasoning.
+
+**Input Format:**
+
+```
+Instruction: <user query>
+Context: <retrieved knowledge>
+```
 
 **Responsibilities:**
-- Multi-step reasoning chain generation  
-- Task decomposition  
-- Response synthesis  
+- Combine user query with retrieved context  
+- Enforce consistent input structure  
+- Prepare model-ready sequences  
+
+---
+
+### 6. Output Formatter (Reasoning Output Layer)
+
+Processes raw model outputs into structured responses.
+
+**Responsibilities:**
+- Clean and format generated text  
+- Ensure coherence and readability  
+- Structure responses for API output  
 
 ---
 
@@ -115,13 +137,26 @@ Processes and structures outputs from the model.
 
 ```
 1. User submits query
-2. API Layer receives request
-3. Input forwarded to Inference Engine
-4. Transformer Model performs reasoning
-5. Retrieval Module augments with context
-6. Reasoning Layer structures response
-7. Response Builder assembles output
-8. Final result returned to user
+2. API Layer receives and validates request
+3. Inference Engine processes input
+
+4. Retrieval Phase:
+   - Generate embedding from query
+   - Query vector database (Qdrant)
+   - Retrieve relevant context
+
+5. Prompt Construction:
+   - Combine instruction and retrieved context
+
+6. Model Execution:
+   - Tokenize input
+   - Run TensorFlow transformer model
+   - Decode output tokens
+
+7. Output Processing:
+   - Format response
+
+8. Final response returned to user
 ```
 
 ---
@@ -132,18 +167,16 @@ Processes and structures outputs from the model.
 flowchart TD
     A[User Query] --> B[API Layer]
     B --> C[Inference Engine]
-    C --> D[ugonuel-impulse-titan-1 Transformer Model]
-    D --> E[Reasoning Layer]
 
-    E --> F[Code Engine]
-    E --> G[Knowledge Engine]
+    C --> D[Embedding Generator]
+    D --> E[Vector Database ~ Qdrant]
+    E --> F[Retrieved Context]
 
-    G --> H[Vector Database→Quadrant]
-    H --> G
+    F --> G[Prompt Builder]
+    C --> G
 
-    F --> I[Response Builder]
-    G --> I
-
+    G --> H[ugonuel-impulse-titan-1 Transformer Model (TensorFlow)]
+    H --> I[Output Formatter]
     I --> J[Final Output]
 ```
 
@@ -151,30 +184,39 @@ flowchart TD
 
 ## Architectural Strengths
 
-- **Modular Design** → Each subsystem can evolve independently  
-- **Hybrid Intelligence** → Combines reasoning + retrieval  
-- **Scalable Pipeline** → Supports future expansion (agents, RL, tools)  
-- **Production-Ready** → API-first architecture for real-world use  
+- **Modular Design**  
+  Each subsystem is independently maintainable and extensible  
+
+- **Retrieval-Augmented Intelligence**  
+  Combines learned knowledge with dynamic external context  
+
+- **Consistent Data Flow**  
+  Clear separation between retrieval, reasoning, and generation  
+
+- **Production-Ready Pipeline**  
+  API-first architecture with real-time inference capability  
 
 ---
 
 ## Future Extensions
 
+The architecture is designed to support future enhancements:
+
 ```
 +----------------------+
-| Autonomous Agents    |
+| Advanced Reasoning   |
 +----------+-----------+
            |
 +----------------------+
-| Tool Calling System  |
+| Reinforcement Learning|
 +----------+-----------+
            |
 +----------------------+
-| Long-Term Memory     |
+| Long-Context Memory  |
 +----------+-----------+
            |
 +----------------------+
-| Self-Reflection Loop |
+| Self-Improvement Loop|
 +----------------------+
 ```
 
@@ -182,10 +224,14 @@ flowchart TD
 
 ## Summary
 
-The **IIMo architecture** is designed to bridge the gap between:
+The **IIMo architecture** provides a structured approach to building modern AI systems by combining:
 
-- Static language models  
-- Dynamic knowledge systems  
-- Real-world AI applications  
+- Transformer-based reasoning (TensorFlow)  
+- Retrieval-augmented knowledge systems  
+- Modular inference pipelines  
 
-By combining **modularity, hybrid intelligence, and real-time inference**, IIMo provides a strong foundation for building next-generation AI systems.
+This design ensures that the system is:
+
+- Scalable  
+- Maintainable  
+- Ready for real-world AI deployment  

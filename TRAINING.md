@@ -1,6 +1,6 @@
 # Model Training — Impulse Intelligent Model (IIMo)
 
-This document describes the datasets, preprocessing steps, and training pipeline used to train the **IIMo Transformer Model**.
+This document describes the datasets, preprocessing steps, and training pipeline used to train the **IIMo Transformer Model (TensorFlow/Keras)**.
 
 ---
 
@@ -9,84 +9,89 @@ This document describes the datasets, preprocessing steps, and training pipeline
 The IIMo model is trained to perform three primary tasks:
 
 1. **Natural Language Reasoning**  
-   Enable structured, multi-step reasoning over complex problems.
+   Enable structured, multi-step reasoning using instruction-based inputs.
 
 2. **Code Generation**  
    Generate syntactically correct and semantically meaningful code.
 
 3. **Knowledge Question Answering**  
-   Provide accurate and context-aware responses to factual and technical queries.
+   Produce accurate responses grounded in provided context.
+
+> Note: Real-time knowledge retrieval (RAG) is handled during inference, not training.
 
 ---
 
 ## Datasets
 
-The training process leverages a **diverse mixture of datasets** (primarily sourced from the Impulse Studio project dashboard) to improve reasoning, coding, and knowledge capabilities.
+The training process leverages a **diverse mixture of datasets** to improve reasoning, coding, and knowledge capabilities.
 
-### Coding Dataset
+### 1. Coding Dataset
 
-Focused on improving program synthesis and code understanding.
+Focused on program synthesis and code understanding.
 
 **Examples:**
 - Python programming tasks  
 - Algorithm implementations  
 - Debugging exercises  
-
-**Sources:**
-- Open-source code repositories  
-- Programming challenge datasets  
-
 ---
 
-### Reasoning Dataset
+### 2. Reasoning Dataset
 
-Designed to teach structured and step-by-step reasoning.
+Designed to teach structured, step-by-step reasoning.
 
 **Examples:**
 - Logical puzzles  
 - Analytical problem-solving tasks  
-- Step-by-step explanations  
+- Chain-of-thought style explanations  
 
 ---
 
-### Knowledge QA Dataset
+### 3. Knowledge QA Dataset
 
-Improves the model’s general knowledge and factual accuracy.
+Improves general knowledge and factual grounding.
 
 **Includes:**
-- Factual question answering  
 - Technical explanations  
-- Domain-specific knowledge  
+- Domain-specific Q&A  
+- Instruction-following tasks  
+
+---
+
+**Sources:**
+- Mainly sourced from the Impulse ML Pipeline
+- Open-source repositories  
+- Programming challenge datasets (e.g., LeetCode-style problems)
 
 ---
 
 ## Data Preparation
 
-Training data undergoes multiple preprocessing stages to ensure consistency and model compatibility.
+Training data undergoes multiple preprocessing stages to ensure consistency and compatibility with the transformer model.
+
+---
 
 ### Tokenization
 
-All text inputs are converted into token sequences using the model's vocabulary.
+- Text is converted into token sequences using a **subword tokenizer** (e.g., SentencePiece or WordPiece)
+- Vocabulary is shared across all tasks
 
 ---
 
 ### Sequence Formatting
 
-Each training example is structured in a standardized format:
+Each training sample follows a **standardized instruction format**:
 
 ```
-Instruction
-Context
-Expected Output
+Instruction: <task description>
+Context: <optional context>
+Output: <expected response>
 ```
 
-This format enables the model to learn **instruction-following behavior**.
+This format aligns directly with the **Prompt Builder used during inference**, ensuring consistency between training and deployment.
 
 ---
 
 ### Dataset Splits
-
-The dataset is divided into three subsets:
 
 | Split       | Purpose                     |
 |------------|----------------------------|
@@ -98,30 +103,39 @@ The dataset is divided into three subsets:
 
 ## Training Pipeline
 
-The training pipeline consists of the following stages:
-
-### 1. Dataset Loading
-
-- Load datasets from configured sources  
-- Convert raw data into structured training examples  
+The training pipeline is implemented using **TensorFlow/Keras** and consists of the following stages:
 
 ---
 
-### 2. Tokenization
+### 1. Dataset Loading
+
+- Load and merge datasets from configured sources  
+- Normalize into a unified instruction-based format  
+
+---
+
+### 2. Tokenization & Batching
 
 - Convert text into token sequences  
-- Apply padding and truncation as required  
+- Apply:
+  - Padding  
+  - Truncation  
+  - Attention masks  
+
+- Group into batches for efficient GPU/TPU training  
 
 ---
 
 ### 3. Model Training
 
-- Train the transformer model using gradient-based optimization  
+- Train the transformer model using **gradient-based optimization**
 
-**Key Training Parameters:**
-- Learning rate  
-- Batch size  
-- Number of epochs  
+**Typical Configuration:**
+- Optimizer: Adam / AdamW  
+- Loss Function: Cross-entropy  
+- Learning Rate Scheduler: Warmup + decay  
+- Batch Size: Configurable  
+- Epochs: Based on dataset size  
 
 ---
 
@@ -130,23 +144,25 @@ The training pipeline consists of the following stages:
 Model performance is evaluated periodically during training.
 
 **Metrics:**
-- Loss  
-- Accuracy  
-- Code correctness  
+
+- **Loss** → Training convergence  
+- **Perplexity** → Language modeling quality  
+- **Exact Match / F1 Score** → QA accuracy  
+- **Code Execution Accuracy (optional)** → Functional correctness  
 
 ---
 
 ### 5. Model Checkpointing
 
 - Save model weights at regular intervals  
-- Enable recovery and reproducibility  
-- Support downstream inference workflows  
+- Track best-performing checkpoints (based on validation metrics)  
+- Enable reproducibility and rollback  
 
 ---
 
 ## Running Training
 
-To start the training process, run:
+To start the training process:
 
 ```bash
 python training/train_model.py
@@ -158,29 +174,55 @@ python training/train_model.py
 
 After training, the following artifacts are generated:
 
-- `model.TFLite` — optimized model for inference  
-- `training_logs/` — logs and training metrics  
-- `evaluation_reports/` — performance evaluation results  
+- `saved_model/` → Full TensorFlow model (for serving/inference)  
+- `model.tflite` → Optimized lightweight model (edge/mobile inference)  
+- `training_logs/` → Metrics and training history  
+- `evaluation_reports/` → Performance summaries  
+
+---
+
+## Relationship with Retrieval (RAG)
+
+The model is trained to **use context effectively**, but does not store all knowledge internally.
+
+During inference:
+
+```
+User Query → Retrieval → Context Injection → Model → Output
+```
+
+This separation ensures:
+
+- Smaller model size  
+- Better factual accuracy  
+- Real-time knowledge updates  
 
 ---
 
 ## Future Training Improvements
 
-Planned enhancements to improve model performance include:
+Planned enhancements include:
 
-- **Reinforcement Learning from Human Feedback (RLHF)**  
-- **Instruction tuning for improved alignment**  
-- **Code execution feedback loops**  
-- **Self-critique and reflection-based training**  
+- **Instruction Tuning**  
+  Improve alignment with user intent  
+
+- **Reinforcement Learning (RLHF / RLAIF)**  
+  Optimize responses using feedback signals  
+
+- **Code Execution Feedback Loops**  
+  Validate generated code during training  
+
+- **Self-Reflection Training**  
+  Enable iterative reasoning and correction  
 
 ---
 
 ## Summary
 
-The IIMo training pipeline is designed to produce a **multi-capability AI model** that integrates:
+The IIMo training pipeline is designed to produce a **multi-capability transformer model** that integrates:
 
-- Reasoning  
+- Instruction-based reasoning  
 - Code intelligence  
-- Knowledge retrieval  
+- Context-aware response generation  
 
-Through a **modular and scalable training approach**, the system can continuously evolve and improve across multiple domains.
+By combining **structured data formatting, TensorFlow-based training, and retrieval-aware design**, the system provides a scalable foundation for building advanced AI applications.

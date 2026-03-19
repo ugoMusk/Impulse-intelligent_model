@@ -1,58 +1,159 @@
 # Impulse Intelligent Model (IIMo)
 
-The **Impulse Intelligent Model (IIMo)** is a research-driven AI project designed to demonstrate how modern AI systems can combine:
+The **Impulse Intelligent Model (IIMo)** is a research-driven AI system designed to demonstrate how modern AI architectures can combine:
 
-- **Machine Learning**
-- **Retrieval-Augmented Reasoning**
-- **Structured Tool Usage**
+- **Transformer-based Machine Learning (TensorFlow)**
+- **Retrieval-Augmented Generation (RAG)**
+- **Structured Reasoning Pipelines**
 
 to perform complex cognitive tasks such as:
 
 - Code generation  
 - Technical reasoning  
 - Knowledge-based question answering  
-- Task planning  
+- Task decomposition  
 - Codebase understanding  
 
-The project was developed for the **Impulse AI Model Track Hackathon** with the objective of building a **fully functional AI model integrated into the Impulse Machine Learning architecture**.
+The project was developed for the **Impulse AI Model Track Hackathon** with the objective of building a **fully functional, modular AI model** within the Impulse Machine Learning architecture.
 
 ---
 
 # Overview
 
-The **Impulse Intelligent Model (IIMo)** is a **multi-capability AI system** powered by a **transformer-based reasoning model** trained through the **Impulse ML training pipeline**.
+IIMo is a **multi-capability AI system** powered by a **TensorFlow-based transformer reasoning model** trained using a structured ML pipeline.
 
 The system integrates three core capabilities:
 
 ### Natural Language Understanding
-Enables the model to interpret human instructions and contextual queries.
+Interprets user instructions and contextual queries.
 
 ### Code Intelligence
-Allows the system to generate, analyze, and reason about source code.
+Generates, analyzes, and reasons about source code.
 
 ### Knowledge Retrieval
-Enhances responses using embedding-based retrieval from external knowledge sources.
+Augments responses using embedding-based retrieval from external knowledge sources.
 
-These capabilities are orchestrated through a **modular AI architecture** that allows the model to reason about complex tasks while dynamically interacting with external knowledge systems.
+These capabilities are orchestrated through a **modular architecture** that separates:
+
+- Model computation  
+- Retrieval  
+- Reasoning  
+- Inference  
+
+---
+
+# System Architecture (Conceptual)
+
+```
+User Query
+    │
+    ▼
+API Layer (FastAPI)
+    │
+    ▼
+Inference Engine
+    │
+ ┌──┴───────────────┐
+ ▼                  ▼
+Retrieval Module    Transformer Model (IIMo - TensorFlow)
+ │                  │
+ ▼                  ▼
+Context Injection   Reasoning Output
+        └──────┬──────┘
+               ▼
+        Response Builder
+               │
+               ▼
+             Output
+```
+
+---
+
+# Core Components
+
+## 1. Transformer Model (IIMo)
+
+The core neural network built using **TensorFlow/Keras**, responsible for:
+
+- Natural language reasoning  
+- Code generation  
+- Response synthesis  
+
+**Key Elements:**
+
+- Tokenizer (WordPiece / BPE / SentencePiece)  
+- Transformer layers (attention-based reasoning)  
+- Decoder (token-to-text generation)  
+
+---
+
+## 2. Retrieval Module
+
+Provides external knowledge using a **vector database (Qdrant)**.
+
+**Pipeline:**
+
+1. Convert query → embedding  
+2. Perform similarity search  
+3. Retrieve relevant documents  
+4. Inject context into model input  
+
+---
+
+## 3. Reasoning Layer
+
+Implements structured reasoning through consistent input formatting.
+
+**Input Format:**
+
+```
+Instruction
+Context (optional)
+Retrieved Knowledge (optional)
+```
+
+**Output Behavior:**
+
+- Step-by-step reasoning where applicable  
+- Structured and coherent responses  
+
+---
+
+## 4. Inference Engine
+
+Executes the full pipeline using TensorFlow:
+
+1. Input preprocessing  
+2. Retrieval (if enabled)  
+3. Prompt construction  
+4. Tokenization  
+5. Model forward pass (`tf.keras.Model`)  
+6. Output decoding  
+
+---
+
+## 5. API Layer
+
+A **FastAPI service** exposing the model for real-time interaction.
 
 ---
 
 # Key Features
 
 ## Reasoning Engine
-Supports **multi-step reasoning** for complex analytical queries.
+Supports **multi-step structured reasoning** via controlled input formatting.
 
 ## Code Generation
-Produces **syntactically correct and functional code snippets** across programming languages.
+Produces **syntactically correct and executable code**.
 
-## Knowledge Retrieval
-Uses **embedding-based vector search** to augment model knowledge.
+## Retrieval-Augmented Responses
+Enhances outputs using **external knowledge via vector search**.
 
 ## Modular ML Pipeline
-Training and inference run entirely within the **Impulse Machine Learning framework**.
+Separates training, inference, and retrieval for scalability.
 
 ## API-Driven Inference
-A **FastAPI service** exposes the model for real-time interaction and integration with external applications.
+Enables real-time usage through HTTP endpoints.
 
 ---
 
@@ -63,73 +164,62 @@ A **FastAPI service** exposes the model for real-time interaction and integratio
 ```bash
 git clone https://github.com/your-org/Impulse-intelligent_model
 cd Impulse-intelligent_model
+```
+
+---
 
 ## 2. Backend Setup
 
-Navigate to the backend directory:
-
 ```bash
 cd backend
-```
-
-Install required dependencies:
-
-```bash
 pip install -r requirements.txt
 ```
 
 ---
 
-## 3. Start Vector Database (Optional)
-
-The retrieval system uses a **vector database** for embedding-based search.
-
-Start the Qdrant container:
+## 3. Start Vector Database (Optional but Recommended)
 
 ```bash
 docker run -p 6333:6333 qdrant/qdrant
 ```
 
+**Note:**
+- If unavailable, the system falls back to **model-only inference**.
+
 ---
 
-## Training the Model
+# Training the Model
 
-Run the training pipeline:
+Run:
 
 ```bash
 python training/train_model.py
 ```
 
-The training pipeline performs the following operations:
+### Training Stack
+
+- TensorFlow / Keras  
+- `tf.data` for dataset pipelines  
+- Custom or built-in training loops  
+
+### Training Includes:
 
 - Dataset loading  
 - Tokenization and preprocessing  
-- Transformer model optimization  
-- Model checkpoint generation  
+- Transformer optimization  
+- Model checkpointing (`SavedModel`)  
 
 ---
 
-## Running Inference
-
-Start the inference API server:
+# Running Inference
 
 ```bash
 uvicorn api.server:app --reload
 ```
 
-This launches the **FastAPI service** used to interact with the model.
-
 ---
 
-## Example Query
-
-### Endpoint
-
-```
-POST /generate
-```
-
-### Request
+# Example Query
 
 ```bash
 curl -X POST "http://localhost:8000/generate" \
@@ -139,85 +229,54 @@ curl -X POST "http://localhost:8000/generate" \
   }'
 ```
 
-### Response
+---
 
-```json
-{
-  "response": "def quicksort(arr): ..."
-}
+# Inference Flow
+
+1. Receive user prompt  
+2. Generate embedding (for retrieval)  
+3. Query vector database (if available)  
+4. Construct structured input:
+
 ```
+Instruction: <user prompt>
+Context: <retrieved knowledge>
+```
+
+5. Tokenize input  
+6. Run TensorFlow model  
+7. Decode output  
+8. Return response  
 
 ---
 
-## Demo Instructions
-
-### Step 1 — Train the Model
-
-```bash
-python training/train_model.py
-```
-
-### Step 2 — Start the Inference Server
-
-```bash
-uvicorn api.server:app
-```
-
-### Step 3 — Send an API Request
-
-```bash
-curl -X POST "http://localhost:8000/generate" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "prompt": "Write a Python function that implements quicksort."
-  }'
-```
-
-### Step 4 — Observe Model Output
-
-The system will generate responses based on **reasoning, retrieval, and model inference**.
-
----
-
-## Evaluation
-
-The system is evaluated across three capability benchmarks:
+# Evaluation
 
 | Capability | Metric |
 |------------|--------|
 | Reasoning  | Logical QA accuracy |
-| Coding     | Code generation correctness |
-| Knowledge  | Retrieval accuracy |
-
-Evaluation scripts are located in:
-
-```
-evaluation/
-```
+| Coding     | Code correctness |
+| Knowledge  | Retrieval relevance |
 
 ---
 
-## Future Work
+# Future Work
 
-Planned improvements include:
-
-- Multi-agent reasoning architecture  
-- Reinforcement learning fine-tuning  
-- Codebase graph memory  
-- IDE integrations for developer workflows  
+- Reinforcement learning fine-tuning (RLHF)  
+- Instruction tuning improvements  
+- TFLite optimization for edge deployment  
+- Long-context memory support  
 
 ---
 
-## License
+# License
 
-This project is released under the **Apache2.0 Liscense**.
+Apache 2.0 License
 
 ---
 
-## Acknowledgements
-
-This project builds on open research and engineering practices in:
+# Acknowledgements
 
 - Transformer architectures  
 - Retrieval-Augmented Generation (RAG)  
-- Modern machine learning pipelines
+- TensorFlow ecosystem  

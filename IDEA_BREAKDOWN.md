@@ -19,7 +19,7 @@ Many models generate surface-level responses without structured, multi-step reas
 #### Static Knowledge
 Traditional models are constrained by their training data and cannot dynamically retrieve or update knowledge in real time.
 
-#### Lack of Modularity
+#### Lack of Modular Architecture
 Most AI systems are tightly coupled, making them difficult to extend, debug, or adapt for new use cases.
 
 #### High Infrastructure Cost
@@ -29,69 +29,117 @@ Training and deploying large-scale models requires significant computational res
 
 ### Proposed Solution
 
-The **Impulse Intelligent Model (IIMo)** addresses these challenges through a **modular, hybrid AI architecture** built on the **Impulse ML framework**.
+The **Impulse Intelligent Model (IIMo)** addresses these challenges through a **modular, retrieval-augmented AI architecture** built on the **Impulse ML framework**.
 
-The system is designed as a composition of three core components:
+The system is composed of three tightly integrated components:
 
 #### 1. Transformer-Based Reasoning Model
-A fine-tuned transformer model capable of:
+
+A **TensorFlow-based transformer model** responsible for:
+
 - Natural language understanding  
-- Multi-step reasoning  
+- Multi-step reasoning (via structured inputs)  
 - Code generation and analysis  
 
+Reasoning is achieved through:
+- Training on structured datasets  
+- Consistent prompt formatting during inference  
+
+---
+
 #### 2. Retrieval-Augmented Knowledge System (RAG)
+
 An embedding-based retrieval layer that:
+
 - Dynamically fetches relevant external knowledge  
 - Enhances factual accuracy and context awareness  
 - Reduces hallucinations  
 
+**Pipeline:**
+```
+Query → Embedding → Vector Search → Retrieved Context → Model Input
+```
+
+---
+
 #### 3. Modular ML Pipeline
+
 A structured pipeline that separates:
+
 - Training  
 - Inference  
 - Retrieval  
 - Evaluation  
 
-This enables scalable development and efficient experimentation.
+This enables:
+
+- Independent development of components  
+- Scalable experimentation  
+- Easier debugging and system optimization  
 
 ---
 
 ### Innovation
 
-**IIMo** introduces several key innovations that differentiate it from traditional AI systems:
+**IIMo** introduces several key innovations:
 
-#### 1. Modular ML Architecture
+#### 1. Modular AI Architecture
+
 The system is cleanly decomposed into independent layers:
-- Training layer  
-- Reasoning layer  
-- Retrieval layer  
-- Inference layer  
 
-This separation enables:
-- Easier debugging  
-- Faster iteration  
-- Scalable system upgrades  
+- Model layer (Transformer - TensorFlow)  
+- Retrieval layer (Embeddings + Vector DB)  
+- Inference layer (Pipeline orchestration)  
+- Input/Output structuring layer (Prompt Builder + Formatter)  
 
-#### 2. Hybrid Intelligence System
-IIMo combines multiple AI paradigms:
-- Neural reasoning (transformers)  
-- Vector-based retrieval (embeddings)  
-- Structured / symbolic processing  
+This enables:
 
-This hybrid approach produces more **accurate, context-aware, and explainable outputs**.
+- Clear separation of concerns  
+- Maintainable system design  
+- Flexible future extensions  
 
-#### 3. Real-Time AI Inference Engine
-The system exposes capabilities through a **FastAPI-based interface**, enabling:
-- Real-time interaction  
-- Integration with external tools  
-- Rapid prototyping and testing  
+---
 
-#### 4. Extensible Research Platform
-The architecture is designed for future expansion, supporting:
-- Autonomous AI agents  
-- Self-reflective reasoning loops  
-- Reinforcement learning fine-tuning  
-- Tool-augmented intelligence systems  
+#### 2. Retrieval-Augmented Reasoning Pipeline
+
+Unlike traditional models, IIMo performs reasoning with **dynamic knowledge injection**:
+
+```
+User Input → Retrieval → Context Injection → Model → Output
+```
+
+This results in:
+
+- Improved factual accuracy  
+- Context-aware reasoning  
+- Reduced hallucination  
+
+---
+
+#### 3. Structured Reasoning via Prompt Design
+
+Instead of relying on implicit reasoning, IIMo enforces a structured input format:
+
+```
+Instruction: <task>
+Context: <retrieved knowledge>
+```
+
+This improves:
+
+- Consistency of outputs  
+- Reasoning clarity  
+- Model alignment with tasks  
+
+---
+
+#### 4. Real-Time Inference System
+
+The system is exposed via a **FastAPI interface**, enabling:
+
+- Real-time AI interaction  
+- Rapid experimentation  
+- Easy integration into external systems  
 
 ---
 
@@ -101,30 +149,29 @@ Compared to traditional AI systems:
 
 | Capability            | Traditional Models | IIMo |
 |----------------------|------------------|------|
-| Reasoning Depth      | Shallow          | Multi-step structured reasoning |
+| Reasoning Depth      | Shallow          | Structured multi-step reasoning |
 | Knowledge Access     | Static           | Dynamic retrieval (RAG) |
-| Architecture         | Monolithic       | Modular & extensible |
+| Architecture         | Monolithic       | Modular pipeline |
 | Adaptability         | Limited          | High |
-| Real-Time Integration| Minimal          | API-driven |
+| Inference            | Static outputs   | Context-aware responses |
 
 ---
 
 ### Expected Impact
 
-IIMo demonstrates a practical approach to building **next-generation AI systems** that are:
+IIMo demonstrates a practical approach to building **modern AI systems** that are:
 
 - Modular  
 - Scalable  
 - Knowledge-aware  
-- Developer-friendly  
+- Engineering-friendly  
 
 #### Potential Use Cases
 
 - AI coding assistants  
 - Research and analysis tools  
 - Intelligent documentation systems  
-- Developer productivity platforms  
-- Autonomous task agents  
+- Developer productivity tools  
 
 ---
 
@@ -132,9 +179,9 @@ IIMo demonstrates a practical approach to building **next-generation AI systems*
 
 The long-term vision of **IIMo** is to evolve into a **general-purpose intelligent system** capable of:
 
-- Understanding complex real-world problems  
-- Reasoning across multiple domains  
-- Interacting with tools and environments  
-- Continuously improving through feedback and learning  
+- Understanding complex problems  
+- Performing multi-step reasoning  
+- Leveraging external knowledge dynamically  
+- Continuously improving through better training and optimization  
 
-This project serves as a foundation toward building **truly intelligent, extensible AI systems** within the Impulse ML ecosystem.
+This project establishes a **foundation for building extensible, high-performance AI systems** within the Impulse ML ecosystem.
