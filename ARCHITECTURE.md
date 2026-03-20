@@ -227,7 +227,7 @@ The architecture is designed to support future enhancements:
 The **IIMo architecture** provides a structured approach to building modern AI systems by combining:
 
 - Transformer-based reasoning (TensorFlow)  
-- Retrieval-augmented knowledge systems  
+- Retrieval-augmented knowledge systems (RAG)
 - Modular inference pipelines  
 
 This design ensures that the system is:

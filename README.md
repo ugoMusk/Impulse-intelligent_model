@@ -108,8 +108,7 @@ Implements structured reasoning through consistent input formatting.
 
 ```
 Instruction
-Context (optional)
-Retrieved Knowledge (optional)
+Context (if applicable)
 ```
 
 **Output Behavior:**
