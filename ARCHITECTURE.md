@@ -1,6 +1,13 @@
 # System Architecture — Impulse Intelligent Model (IIMo)
 
-The **IIMo system** is designed as a **modular, retrieval-augmented AI pipeline** that integrates transformer-based reasoning with external knowledge retrieval for real-time inference.
+The **IIMo system** is a **modular, hybrid AI architecture** that combines:
+
+- Transformer-based reasoning (TensorFlow)
+- Retrieval-Augmented Generation (RAG)
+- Long-term memory
+- Edge AI (Edge Impulse)
+
+The system is designed for **real-time, context-aware, and extensible AI inference**.
 
 ---
 
@@ -18,30 +25,43 @@ The **IIMo system** is designed as a **modular, retrieval-augmented AI pipeline*
            |
            v
 +----------------------+
-|  Inference Engine    |
+|   Inference Engine   |
+|   (Orchestrator)     |
 +----------+-----------+
            |
            v
++------------------------------+
+|        Input Router          |
+| (Task Classification Layer)  |
++-----+-----------+------------+
+      |           |            
+      v           v            
++-----------+   +----------------------+
+| Retrieval |   | Edge AI Module       |
+| (RAG)     |   | (Edge Impulse)       |
++-----+-----+   +----------+-----------+
+      |                    |
+      v                    v
++--------------------------------------+
+|        Long-Term Memory Module        |
+| (Context Persistence & Recall)        |
++------------------+-------------------+
+                   |
+                   v
++--------------------------------------+
+|         Prompt Builder               |
+| (Instruction + Context + Memory)     |
++------------------+-------------------+
+                   |
+                   v
++--------------------------------------+
+|  IIMo Transformer Model              |
+|  (TensorFlow - ugonuel-impulse-titan-1) |
++------------------+-------------------+
+                   |
+                   v
 +----------------------+
-| Retrieval Module     |
-| (Embeddings + DB)    |
-+----------+-----------+
-           |
-           v
-+----------------------+
-| Prompt Builder       |
-| (Instruction+Context)|
-+----------+-----------+
-           |
-           v
-+-------------------------------+
-| IIMo Transformer Model        |
-| (TensorFlow)                  |
-+----------+--------------------+
-           |
-           v
-+----------------------+
-| Output Formatter     |
+|   Output Formatter   |
 +----------+-----------+
            |
            v
@@ -54,82 +74,139 @@ The **IIMo system** is designed as a **modular, retrieval-augmented AI pipeline*
 
 ### 1. API Layer
 
-Provides external access to the system through REST endpoints.
+Provides external access via REST (FastAPI).
 
 **Responsibilities:**
 - Request validation  
 - Input preprocessing  
-- Response formatting  
+- Response serialization  
 
 ---
 
-### 2. Inference Engine
+### 2. Inference Engine (Orchestrator)
 
-Central orchestration layer responsible for executing the full AI pipeline.
+The **central brain of the system**, coordinating all modules.
 
 **Responsibilities:**
-- Input handling  
-- Retrieval orchestration  
-- Prompt construction  
-- Tokenization  
-- Model execution  
-- Output decoding  
+- Pipeline orchestration  
+- Routing decisions  
+- Module coordination  
+- Response aggregation  
 
 ---
 
-### 3. IIMo Transformer Model (ugonuel-impulse-titan-1)
+### 3. Input Router (Task Classification Layer)
 
-The core neural model built using **TensorFlow/Keras**, responsible for reasoning and generation.
+Determines how a request should be processed.
+
+**Responsibilities:**
+- Classify input type:
+  - NLP reasoning → Transformer  
+  - Knowledge query → Retrieval  
+  - Contextual query → Memory  
+  - Audio/sensor input → Edge Impulse  
+- Route to appropriate modules  
+
+---
+
+### 4. IIMo Transformer Model (ugonuel-impulse-titan-1)
+
+Core reasoning engine built with **TensorFlow/Keras**.
+
+**Capabilities:**
+- Natural language understanding  
+- Multi-step reasoning  
+- Code generation  
 
 **Architecture Components:**
 - Token embeddings  
-- Transformer layers (attention mechanisms)  
-- Prediction head  
+- Multi-head attention layers  
+- Feed-forward networks  
+- Output prediction head  
 
 ---
 
-### 4. Retrieval Module
+### 5. Retrieval Module (RAG)
 
-Enables dynamic knowledge augmentation using a vector database.
+Provides dynamic knowledge access using vector search.
 
 **Components:**
 - Embedding generator  
-- Vector database (**Qdrant**)  
-- Similarity search  
+- Vector database (Qdrant)  
+- Similarity search engine  
 
 **Responsibilities:**
-- Convert query into embeddings  
-- Perform nearest-neighbor search  
-- Return relevant contextual documents  
+- Convert query → embeddings  
+- Retrieve relevant documents  
+- Supply context to model  
 
 ---
 
-### 5. Prompt Builder (Reasoning Input Layer)
+### 6. Long-Term Memory Module (Core Feature)
 
-Constructs structured inputs for the model to enable effective reasoning.
+Maintains persistent user/system context.
+
+**Components:**
+- Memory store (vector + structured)  
+- Context retriever  
+- Memory updater  
+
+**Responsibilities:**
+- Store past interactions  
+- Retrieve relevant historical context  
+- Improve personalization and continuity  
+
+---
+
+### 7. Edge AI Module (Edge Impulse Integration)
+
+Handles **real-time edge intelligence tasks**.
+
+**Components:**
+- Edge client (API integration)  
+- Inference handler  
+- Edge router  
+
+**Responsibilities:**
+- Process audio, sensor, or real-time signals  
+- Perform classification using Edge Impulse models  
+- Feed results into the reasoning pipeline  
+
+**Examples:**
+- Voice-triggered commands  
+- Sensor anomaly detection  
+- Real-time event classification  
+
+---
+
+### 8. Prompt Builder (Reasoning Input Layer)
+
+Constructs structured model inputs.
 
 **Input Format:**
 
 ```
 Instruction: <user query>
 Context: <retrieved knowledge>
+Memory: <relevant past interactions>
+Edge Signals: <optional edge inference>
 ```
 
 **Responsibilities:**
-- Combine user query with retrieved context  
-- Enforce consistent input structure  
+- Merge all context sources  
+- Normalize input format  
 - Prepare model-ready sequences  
 
 ---
 
-### 6. Output Formatter (Reasoning Output Layer)
+### 9. Output Formatter (Reasoning Output Layer)
 
-Processes raw model outputs into structured responses.
+Transforms raw model output into usable responses.
 
 **Responsibilities:**
-- Clean and format generated text  
-- Ensure coherence and readability  
-- Structure responses for API output  
+- Clean generated text  
+- Ensure coherence  
+- Format structured API responses  
 
 ---
 
@@ -137,26 +214,43 @@ Processes raw model outputs into structured responses.
 
 ```
 1. User submits query
-2. API Layer receives and validates request
-3. Inference Engine processes input
+2. API Layer validates request
+3. Inference Engine receives input
 
-4. Retrieval Phase:
-   - Generate embedding from query
+4. Input Routing:
+   - Classify request type
+   - Route to:
+     • Retrieval (RAG)
+     • Memory
+     • Edge Impulse (if applicable)
+
+5. Retrieval Phase:
+   - Generate embeddings
    - Query vector database (Qdrant)
    - Retrieve relevant context
 
-5. Prompt Construction:
-   - Combine instruction and retrieved context
+6. Memory Phase:
+   - Retrieve relevant past context
 
-6. Model Execution:
-   - Tokenize input
-   - Run TensorFlow transformer model
-   - Decode output tokens
+7. Edge Processing (if needed):
+   - Run Edge Impulse inference
+   - Return structured signals
 
-7. Output Processing:
+8. Prompt Construction:
+   - Combine instruction + context + memory + edge signals
+
+9. Model Execution:
+   - Tokenization
+   - Transformer inference (TensorFlow)
+   - Output decoding
+
+10. Output Processing:
    - Format response
 
-8. Final response returned to user
+11. Memory Update:
+   - Store interaction for future use
+
+12. Return final response
 ```
 
 ---
@@ -168,16 +262,28 @@ flowchart TD
     A[User Query] --> B[API Layer]
     B --> C[Inference Engine]
 
-    C --> D[Embedding Generator]
-    D --> E[Vector Database ~ Qdrant]
+    C --> R[Input Router]
+
+    R --> D[Embedding Generator]
+    D --> E[Qdrant Vector DB]
     E --> F[Retrieved Context]
 
+    R --> M[Memory Module]
+    M --> F2[Memory Context]
+
+    R --> EI[Edge Impulse API]
+    EI --> ES[Edge Signals]
+
     F --> G[Prompt Builder]
+    F2 --> G
+    ES --> G
     C --> G
 
-    G --> H[ugonuel-impulse-titan-1 Transformer Model ~ TensorFlow]
+    G --> H[Transformer Model ~ TensorFlow]
     H --> I[Output Formatter]
     I --> J[Final Output]
+
+    J --> M
 ```
 
 ---
@@ -185,22 +291,23 @@ flowchart TD
 ## Architectural Strengths
 
 - **Modular Design**  
-  Each subsystem is independently maintainable and extensible  
+  Independent, replaceable system components  
 
-- **Retrieval-Augmented Intelligence**  
-  Combines learned knowledge with dynamic external context  
+- **Hybrid Intelligence**  
+  Combines neural reasoning, retrieval, memory, and edge AI  
 
-- **Consistent Data Flow**  
-  Clear separation between retrieval, reasoning, and generation  
+- **Real-Time Capabilities**  
+  Supports live inference and external integrations  
 
-- **Production-Ready Pipeline**  
-  API-first architecture with real-time inference capability  
+- **Scalable & Extensible**  
+  Easily supports future AI capabilities  
+
+- **Edge + Cloud Synergy**  
+  Integrates lightweight edge intelligence with deep reasoning  
 
 ---
 
 ## Future Extensions
-
-The architecture is designed to support future enhancements:
 
 ```
 +----------------------+
@@ -212,10 +319,6 @@ The architecture is designed to support future enhancements:
 +----------+-----------+
            |
 +----------------------+
-| Long-Context Memory  |
-+----------+-----------+
-           |
-+----------------------+
 | Self-Improvement Loop|
 +----------------------+
 ```
@@ -224,14 +327,16 @@ The architecture is designed to support future enhancements:
 
 ## Summary
 
-The **IIMo architecture** provides a structured approach to building modern AI systems by combining:
+The **IIMo architecture** represents a next-generation AI system that integrates:
 
 - Transformer-based reasoning (TensorFlow)  
-- Retrieval-augmented knowledge systems (RAG)
-- Modular inference pipelines  
+- Retrieval-augmented knowledge systems (Qdrant)  
+- Persistent long-term memory  
+- Edge AI capabilities (Edge Impulse)  
 
-This design ensures that the system is:
+This results in a system that is:
 
+- Context-aware  
 - Scalable  
-- Maintainable  
-- Ready for real-world AI deployment  
+- Modular  
+- Production-ready and capable of evolving into a **general-purpose intelligent system**.
