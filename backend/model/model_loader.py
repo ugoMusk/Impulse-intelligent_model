@@ -10,7 +10,7 @@ from model.config import Config
 
 class ModelLoader:
     """
-    Production-grade model loader for IIMo.
+    Model loader for IIMo.
     Handles:
     - Model initialization
     - Checkpoint loading
@@ -35,7 +35,7 @@ class ModelLoader:
     # =========================
     # Model
     # =========================
-    # def build_model(self) -> IIMoModel:
+    def build_model(self) -> IIMoModel:
         """
         Initialize model architecture
         """
