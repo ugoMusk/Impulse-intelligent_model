@@ -72,16 +72,20 @@ Impulse-intelligent_model/
 │   │   ├── retrieve.py
 │   │   └── index_data.py
 │   │
-│   ├── memory/                    # NEW (MVP FEATURE)
+│   ├── memory/    
 │   │   ├── memory_store.py
 │   │   ├── memory_retriever.py
 │   │   └── memory_updater.py
 │   │
-│   ├── edge/                      # NEW (EDGE IMPULSE)
-│   │   ├── edge_client.py
-│   │   ├── edge_inference.py
-│   │   ├── edge_router.py
-│   │   └── edge_config.py
+│   ├── edge_impulse/                     
+│   │   ├── __init__.py
+│   │   ├── config.py
+│   │   ├── client.py
+│   │   ├── ingestion.py
+│   │   ├── training.py
+│   │   ├── device_manager.py
+│   │   ├── pipeline.py
+│   │   └── retry_queue.py
 │   │
 │   ├── model/
 │   │   ├── transformer.py
