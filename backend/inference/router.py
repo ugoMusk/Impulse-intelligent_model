@@ -3,14 +3,13 @@ from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 from typing import Optional, List, Dict
 import threading
-import logging
 
 from inference.pipeline import InferencePipeline
 from model.model_loader import ModelLoader
 from memory.memory_manager import MemoryManager
 
-
-logger = logging.getLogger(__name__)
+# ✅ Use proper logger
+from monitoring.logger import logger
 
 
 # =========================
@@ -40,6 +39,8 @@ class PipelineManager:
         if cls._instance is None:
             with cls._lock:
                 if cls._instance is None:
+                    logger.info("Initializing model pipeline...")
+
                     loader = ModelLoader(
                         config_path="configs/model_config.yaml",
                         model_dir="checkpoints/",
@@ -47,13 +48,14 @@ class PipelineManager:
                     )
                     loader.load_model()
 
-                    # ✅ Attach memory
                     memory = MemoryManager()
 
                     cls._instance = InferencePipeline(
                         model_loader=loader,
                         memory=memory
                     )
+
+                    logger.info("Pipeline ready")
 
         return cls._instance
 
@@ -69,7 +71,7 @@ def generate_text(request: InferenceRequest):
     try:
         pipeline = PipelineManager.get_pipeline()
 
-        logger.info(f"Request: {request.instruction[:50]}")
+        logger.info(f"[REQUEST] {request.instruction[:50]}")
 
         result = pipeline.run(
             instruction=request.instruction,
@@ -84,12 +86,12 @@ def generate_text(request: InferenceRequest):
         return result
 
     except Exception as e:
-        logger.error(f"Inference error: {str(e)}")
+        logger.error(f"[ERROR] {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
 # =========================
-# Streaming Endpoint (FIXED)
+# Streaming Endpoint
 # =========================
 @router.post("/stream")
 def stream_text(request: InferenceRequest):
@@ -113,13 +115,10 @@ def stream_text(request: InferenceRequest):
         )
 
     except Exception as e:
-        logger.error(f"Streaming error: {str(e)}")
+        logger.error(f"[STREAM ERROR] {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# =========================
-# Health Check
-# =========================
 @router.get("/health")
 def health_check():
     return {"status": "ok"}
